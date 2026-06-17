@@ -12,6 +12,7 @@ import java.util.List;
  * @author Noé Thierry Tchikpo
  * @version 1.0
  */
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/students")
 public class StudentController {
