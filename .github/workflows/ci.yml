@@ -1,4 +1,4 @@
-name: CI - Students API
+name: CI-Students API
 
 on:
   push:
