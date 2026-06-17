@@ -23,5 +23,5 @@ jobs:
       - name: Compiler le projet
         run: mvn compile
 
-      - name: Lancer les tests
+      - name: Lancer les test
         run: mvn test
