@@ -6,10 +6,6 @@ import java.util.List;
 
 /**
  * @brief Service de gestion des étudiants.
- *
- * Contient la logique métier pour les opérations
- * CRUD sur les étudiants.
- *
  * @author Noé Thierry Tchikpo
  * @version 1.0
  */
@@ -22,17 +18,17 @@ public class StudentService {
 
     /**
      * @brief Récupère tous les étudiants.
-     * @return Liste de tous les étudiants en base.
+     * @return Liste de tous les étudiants.
      */
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
     }
 
     /**
-     * @brief Récupère un étudiant par son identifiant.
-     * @param id Identifiant unique de l'étudiant.
-     * @return L'étudiant correspondant à l'id.
-     * @throws RuntimeException si l'étudiant est introuvable.
+     * @brief Récupère un étudiant par son id.
+     * @param id Identifiant de l'étudiant.
+     * @return L'étudiant correspondant.
+     * @throws RuntimeException si introuvable.
      */
     public Student getStudentById(Long id) {
         return studentRepository.findById(id)
@@ -40,9 +36,18 @@ public class StudentService {
     }
 
     /**
-     * @brief Ajoute un nouvel étudiant en base.
+     * @brief Recherche des étudiants par nom.
+     * @param nom Nom à rechercher.
+     * @return Liste des étudiants correspondants.
+     */
+    public List<Student> searchByNom(String nom) {
+        return studentRepository.findByNomContainingIgnoreCase(nom);
+    }
+
+    /**
+     * @brief Ajoute un nouvel étudiant.
      * @param student L'étudiant à ajouter.
-     * @return L'étudiant ajouté avec son id généré.
+     * @return L'étudiant ajouté avec son id.
      */
     public Student addStudent(Student student) {
         return studentRepository.save(student);
@@ -50,10 +55,10 @@ public class StudentService {
 
     /**
      * @brief Modifie un étudiant existant.
-     * @param id Identifiant de l'étudiant à modifier.
-     * @param newStudent Nouvelles données de l'étudiant.
+     * @param id Identifiant de l'étudiant.
+     * @param newStudent Nouvelles données.
      * @return L'étudiant mis à jour.
-     * @throws RuntimeException si l'étudiant est introuvable.
+     * @throws RuntimeException si introuvable.
      */
     public Student updateStudent(Long id, Student newStudent) {
         Student student = getStudentById(id);
@@ -65,10 +70,14 @@ public class StudentService {
     }
 
     /**
-     * @brief Supprime un étudiant par son identifiant.
-     * @param id Identifiant de l'étudiant à supprimer.
+     * @brief Supprime un étudiant par son id.
+     * @param id Identifiant de l'étudiant.
+     * @throws RuntimeException si introuvable.
      */
     public void deleteStudent(Long id) {
+        if (!studentRepository.existsById(id)) {
+            throw new RuntimeException("Étudiant non trouvé");
+        }
         studentRepository.deleteById(id);
     }
 }

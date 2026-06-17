@@ -1,15 +1,14 @@
 package com.noe.students_api;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
  * @brief Contrôleur REST pour la gestion des étudiants.
- *
- * Expose les endpoints HTTP pour les opérations CRUD
- * sur les étudiants.
- *
  * @author Noé Thierry Tchikpo
  * @version 1.0
  */
@@ -27,52 +26,78 @@ public class StudentController {
      * GET /api/students
      */
     @GetMapping
-    public List<Student> getAllStudents() {
-        return studentService.getAllStudents();
+    public ResponseEntity<List<Student>> getAllStudents() {
+        return ResponseEntity.ok(studentService.getAllStudents());
     }
 
     /**
      * @brief Récupère un étudiant par son id.
      * @param id Identifiant de l'étudiant.
-     * @return L'étudiant correspondant.
+     * @return L'étudiant ou 404 si introuvable.
      * GET /api/students/{id}
      */
     @GetMapping("/{id}")
-    public Student getStudentById(@PathVariable Long id) {
-        return studentService.getStudentById(id);
+    public ResponseEntity<Student> getStudentById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(studentService.getStudentById(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * @brief Recherche des étudiants par nom.
+     * @param nom Nom à rechercher.
+     * @return Liste des étudiants correspondants.
+     * GET /api/students/search?nom=Tchikpo
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<Student>> searchByNom(@RequestParam String nom) {
+        return ResponseEntity.ok(studentService.searchByNom(nom));
     }
 
     /**
      * @brief Ajoute un nouvel étudiant.
-     * @param student L'étudiant à ajouter.
-     * @return L'étudiant ajouté avec son id.
+     * @param student L'étudiant à ajouter (validé).
+     * @return L'étudiant ajouté avec code 201.
      * POST /api/students
      */
     @PostMapping
-    public Student addStudent(@RequestBody Student student) {
-        return studentService.addStudent(student);
+    public ResponseEntity<Student> addStudent(@Valid @RequestBody Student student) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(studentService.addStudent(student));
     }
 
     /**
      * @brief Modifie un étudiant existant.
-     * @param id Identifiant de l'étudiant à modifier.
-     * @param student Nouvelles données.
-     * @return L'étudiant mis à jour.
+     * @param id Identifiant de l'étudiant.
+     * @param student Nouvelles données (validées).
+     * @return L'étudiant mis à jour ou 404.
      * PUT /api/students/{id}
      */
     @PutMapping("/{id}")
-    public Student updateStudent(@PathVariable Long id,
-                                 @RequestBody Student student) {
-        return studentService.updateStudent(id, student);
+    public ResponseEntity<Student> updateStudent(@PathVariable Long id,
+                                                 @Valid @RequestBody Student student) {
+        try {
+            return ResponseEntity.ok(studentService.updateStudent(id, student));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     /**
      * @brief Supprime un étudiant par son id.
-     * @param id Identifiant de l'étudiant à supprimer.
+     * @param id Identifiant de l'étudiant.
+     * @return 204 No Content ou 404.
      * DELETE /api/students/{id}
      */
     @DeleteMapping("/{id}")
-    public void deleteStudent(@PathVariable Long id) {
-        studentService.deleteStudent(id);
+    public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
+        try {
+            studentService.deleteStudent(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
